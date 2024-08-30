@@ -25,67 +25,126 @@ public_users.post("/register", (req,res) => {
 
 // Get the book list available in the shop
 public_users.get('/',function (req, res) {
-    res.send(JSON.stringify(books));
+    const fetchBooksPromise = new Promise((resolve, reject) => {
+        setTimeout(() => {
+          resolve(books); // Resolve with the books data
+        }, 500); // Simulate a 500ms delay 
+      });
+    
+      fetchBooksPromise
+        .then(booksData => {
+          res.json(booksData); // Send books as JSON on success
+        })
+        .catch(error => {
+          res.status(500).json({ message: "Error fetching books" }); // Handle errors
+        });
 });
 
 // Get book details based on ISBN
 public_users.get('/isbn/:isbn',function (req, res) {
-    const reqIsbn = req.params.isbn;
-    if (books[reqIsbn]) {
-        res.send(JSON.stringify(books[reqIsbn]));
-    } else {
-        res.status(404).json({message: "Book not found"});
-    }
+    const isbn = req.params.isbn;
+
+    const fetchBookPromise = new Promise((resolve, reject) => {
+        setTimeout(() => {
+            if (books[isbn]) {
+                resolve(books[isbn]);
+            } else {
+                reject({ message: "Book not found with this ISBN." });
+            }
+        }, 500); // Simulating a 500ms delay 
+    });
+  
+    fetchBookPromise
+        .then(book => {
+            res.json(book); 
+        })
+        .catch(error => {
+            res.status(404).json(error); 
+        });
  });
 
 // Get book details based on author
 public_users.get('/author/:author',function (req, res) {
   //Write your code here
   const reqUser = req.params.author.toLowerCase();
-  let resBooks = [];
-  for (const isbn of Object.keys(books)) {
-    if (books[isbn].author.toLowerCase() === reqUser) {
-        resBooks.push({
-            "isbn": isbn,
-            "title": books[isbn].title,
-            "author": books[isbn].author });
-    }
-  }
-  if (resBooks.length > 0) {
-    res.send({"booksbyauthor": resBooks});
-  } else {
-    res.status(404).json({message: "No Book found for author: " + reqUser});
-  }
+  const fetchBookPromise = new Promise((resolve, reject) => {
+    setTimeout(() => {
+        let resBooks = [];
+        for (const isbn of Object.keys(books)) {
+            if (books[isbn].author.toLowerCase() === reqUser) {
+                resBooks.push({
+                    "isbn": isbn,
+                    "title": books[isbn].title,
+                    "author": books[isbn].author });
+            }
+        }
+        if (resBooks.length > 0 ) {
+            resolve(resBooks);
+        } else {
+            reject({message: "No books found."});
+        }
+    }, 500);
+  });
+  fetchBookPromise
+  .then(books => {
+      res.json(books); 
+  })
+  .catch(error => {
+      res.status(404).json(error); 
+  });
 });
 
 // Get all books based on title
 public_users.get('/title/:title',function (req, res) {
   //Write your code here
   const reqTitle = req.params.title.toLowerCase();
-  let resBooks = [];
-  for (const isbn of Object.keys(books)) {
-    if (books[isbn].title.toLowerCase() === reqTitle) {
-        resBooks.push({
-            "isbn": isbn,
-            "title": books[isbn].title,
-            "author": books[isbn].author });
-    }
-  }
-  if (resBooks.length > 0) {
-    res.send({"booksbytitle": resBooks});
-  } else {
-    res.status(404).json({message: "No Book found for title: " + reqTitle});
-  }
+  const fetchBookPromise = new Promise((resolve, reject) => {
+    setTimeout(() => {
+        let resBooks = [];
+        for (const isbn of Object.keys(books)) {
+            if (books[isbn].title.toLowerCase() === reqTitle) {
+                resBooks.push({
+                    "isbn": isbn,
+                    "title": books[isbn].title,
+                    "author": books[isbn].author });
+            }
+        }
+        if (resBooks.length > 0 ) {
+            resolve(resBooks);
+        } else {
+            reject({message: "No books found."});
+        }
+    }, 500);
+  });
+  fetchBookPromise
+  .then(books => {
+      res.json(books); 
+  })
+  .catch(error => {
+      res.status(404).json(error); 
+  });
 });
 
 //  Get book review
 public_users.get('/review/:isbn',function (req, res) {
-    const reqIsbn = req.params.isbn;
-    if (books[reqIsbn]) {
-        res.send(books[reqIsbn].reviews);
-    } else {
-        res.status(404).json({message: "Book not found"});
-    }
+    const isbn = req.params.isbn;
+    const fetchBookPromise = new Promise((resolve, reject) => {
+        setTimeout(() => {
+            if (books[isbn]) {
+                resolve(books[isbn].reviews);
+            } else {
+                reject({ message: "Book not found with this ISBN." });
+            }
+        }, 500);  
+    });
+    fetchBookPromise
+    .then(reviews => {
+        res.json(reviews); 
+    })
+    .catch(error => {
+        res.status(404).json(error); 
+    });
+
 });
 
 module.exports.general = public_users;
